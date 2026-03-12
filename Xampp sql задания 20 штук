@@ -1,0 +1,63 @@
+/* ПРАКТИЧЕСКАЯ РАБОТА: ВЫБОРКА ДАННЫХ ИЗ ТАБЛИЦЫ COUNTRY 
+   База данных: world
+*/
+
+-- 1. Страны, названия которых начинаются на букву “К” (лимит 5)
+SELECT Name FROM country WHERE Name LIKE 'K%' LIMIT 5;
+
+-- 2. Страны, получившие независимость в 19-м веке (1801-1900)
+SELECT Name, IndepYear FROM country WHERE IndepYear BETWEEN 1801 AND 1900;
+
+-- 3. Страны ближнего востока (Middle East)
+SELECT Name FROM country WHERE Region = 'Middle East';
+
+-- 4. Европейские страны, которые образовались в 19 веке
+SELECT Name FROM country WHERE Continent = 'Europe' AND IndepYear BETWEEN 1801 AND 1900;
+
+-- 5. Страны, в названиях которых содержат слог “ра” (используем %ра% или %ra%)
+SELECT Name FROM country WHERE Name LIKE '%ra%';
+
+-- 6. Страны, названия которых начинаются на гласную букву (A, E, I, O, U, Y)
+SELECT Name FROM country WHERE Name REGEXP '^[AEIOUY]';
+
+-- 7. Страны, названия которых начинаются и заканчиваются на одну и ту же букву
+SELECT Name FROM country WHERE LEFT(Name, 1) = RIGHT(Name, 1);
+
+-- 8. Государства с монархической формой правления
+SELECT Name, GovernmentForm FROM country WHERE GovernmentForm LIKE '%Monarchy%';
+
+-- 9. Страны, население которых меньше 1 млн.
+SELECT Name, Population FROM country WHERE Population < 1000000;
+
+-- 10. Самое древнее государство (сортировка по году независимости)
+SELECT Name, IndepYear FROM country WHERE IndepYear IS NOT NULL ORDER BY IndepYear ASC LIMIT 1;
+
+-- 11. Страны, год обретения независимости которыми не определен
+SELECT Name FROM country WHERE IndepYear IS NULL;
+
+-- 12. Страны, где год независимости ИЛИ столица не определены
+SELECT Name FROM country WHERE IndepYear IS NULL OR Capital IS NULL;
+
+-- 13. Самое маленькое по площади государство
+SELECT Name, SurfaceArea FROM country ORDER BY SurfaceArea ASC LIMIT 1;
+
+-- 14. Первую десятку наиболее населенных государств мира
+SELECT Name, Population FROM country ORDER BY Population DESC LIMIT 10;
+
+-- 15. Первую десятку наиболее населенных государств Европы
+SELECT Name, Population FROM country WHERE Continent = 'Europe' ORDER BY Population DESC LIMIT 10;
+
+-- 16. Суммарное число жителей стран Европы и их суммарная площадь
+SELECT SUM(Population) AS 'Total Pop', SUM(SurfaceArea) AS 'Total Area' FROM country WHERE Continent = 'Europe';
+
+-- 17. Число стран, расположенных не в Антарктике
+SELECT COUNT(*) AS 'Count' FROM country WHERE Continent != 'Antarctica';
+
+-- 18. Число стран с главой Елизаветой II и их население
+SELECT COUNT(*) AS 'Countries', SUM(Population) AS 'Total Pop' FROM country WHERE HeadOfState = 'Elisabeth II';
+
+-- 19. Полинезия: кол-во стран, Max и Min жителей
+SELECT COUNT(*) AS 'Qty', MAX(Population), MIN(Population) FROM country WHERE Region = 'Polynesia';
+
+-- 20. Первые 5% списка стран мира наименьшей площади (примерно 12 стран)
+SELECT Name, SurfaceArea FROM country ORDER BY SurfaceArea ASC LIMIT 12;
