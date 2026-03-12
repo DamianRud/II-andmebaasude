@@ -1,0 +1,55 @@
+Краткий SQL конспект
+1️⃣ LIKE / NOT LIKE
+LIKE — поиск по шаблону.
+% = любое количество символов
+_ = ровно один символ
+SQL
+Копировать код
+SELECT * FROM users WHERE name LIKE 'A%'; -- имена, начинающиеся на A
+SELECT * FROM users WHERE name NOT LIKE 'A%'; -- имена, НЕ начинающиеся на A
+2️⃣ BETWEEN / NOT BETWEEN
+BETWEEN X AND Y — значение в диапазоне (включительно)
+NOT BETWEEN X AND Y — значение вне диапазона
+SQL
+Копировать код
+SELECT * FROM students WHERE age BETWEEN 18 AND 21;
+SELECT * FROM students WHERE age NOT BETWEEN 18 AND 21;
+3️⃣ AND / OR
+AND — оба условия должны быть истинными
+OR — хотя бы одно условие истинно
+SQL
+Копировать код
+SELECT * FROM students WHERE age > 18 AND grade > 80;
+SELECT * FROM students WHERE age < 19 OR grade > 90;
+4️⃣ LEFT JOIN / RIGHT JOIN
+LEFT JOIN — все строки из левой таблицы + совпадения из правой
+RIGHT JOIN — все строки из правой таблицы + совпадения из левой
+SQL
+Копировать код
+SELECT students.name, courses.course_name
+FROM students
+LEFT JOIN courses ON students.id = courses.student_id;
+5️⃣ ORDER BY / LIMIT
+ORDER BY — сортировка (ASC по возрастанию, DESC по убыванию)
+LIMIT — ограничение количества строк, можно с оффсетом
+SQL
+Копировать код
+SELECT * FROM products ORDER BY price DESC LIMIT 3; -- топ 3 дорогих
+6️⃣ SUM / MIN / MAX / COUNT / AVG
+SUM(column) — сумма значений
+MIN(column) — минимальное значение
+MAX(column) — максимальное значение
+COUNT(column) — количество строк
+AVG(column) — среднее значение
+SQL
+Копировать код
+SELECT SUM(price) AS total_sales FROM orders;
+SELECT MIN(price) AS cheapest FROM products;
+SELECT COUNT(*) AS total_users FROM users;
+7️⃣ LEFT() / RIGHT()
+LEFT(str,n) — первые n символов строки
+RIGHT(str,n) — последние n символов строки
+SQL
+Копировать код
+SELECT Name FROM country WHERE LEFT(Name,1) = RIGHT(Name,1);
+-- страны, где первая и последняя буква одинаковые
