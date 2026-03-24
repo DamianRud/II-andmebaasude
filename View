@@ -1,0 +1,102 @@
+🧱 Исходные таблицы (как обычно в заданиях)
+SQL
+CREATE TABLE students (
+    id INT,
+    name VARCHAR(50),
+    grade INT
+);
+
+CREATE TABLE courses (
+    id INT,
+    title VARCHAR(50)
+);
+
+CREATE TABLE enrollments (
+    student_id INT,
+    course_id INT
+);
+📘 ЗАДАНИЕ 1 (самое простое)
+👉 Создать VIEW с учениками с оценкой выше 80
+SQL
+CREATE VIEW good_students AS
+SELECT *
+FROM students
+WHERE grade > 80;
+Проверка:
+SQL
+SELECT * FROM good_students;
+📘 ЗАДАНИЕ 2
+👉 Показать только имена студентов
+SQL
+CREATE VIEW student_names AS
+SELECT name
+FROM students;
+📘 ЗАДАНИЕ 3
+👉 VIEW с JOIN (часто дают)
+Показать: имя студента + курс
+SQL
+CREATE VIEW student_courses AS
+SELECT s.name, c.title
+FROM students s
+JOIN enrollments e ON s.id = e.student_id
+JOIN courses c ON e.course_id = c.id;
+Проверка:
+SQL
+SELECT * FROM student_courses;
+📘 ЗАДАНИЕ 4
+👉 VIEW с условием
+Только студенты с оценкой > 70
+SQL
+CREATE VIEW passed_students AS
+SELECT name, grade
+FROM students
+WHERE grade > 70;
+📘 ЗАДАНИЕ 5
+👉 Использовать VIEW в запросе
+SQL
+SELECT *
+FROM good_students
+WHERE grade > 90;
+👉 Это любят спрашивать: “можно ли использовать VIEW?” → да
+📘 ЗАДАНИЕ 6
+👉 Обновление через VIEW (простой случай)
+SQL
+CREATE VIEW simple_students AS
+SELECT id, name FROM students;
+Теперь:
+SQL
+UPDATE simple_students
+SET name = 'Alex'
+WHERE id = 1;
+📘 ЗАДАНИЕ 7
+👉 Удалить VIEW
+SQL
+DROP VIEW student_names;
+📘 ЗАДАНИЕ 8
+👉 Изменить VIEW
+SQL
+CREATE OR REPLACE VIEW good_students AS
+SELECT name, grade
+FROM students
+WHERE grade > 75;
+🧠 Что обычно проверяют на контрольной
+👉 Ты должен уметь:
+Создать VIEW (CREATE VIEW)
+Написать SELECT внутри него
+Использовать JOIN
+Сделать WHERE
+Использовать VIEW в другом запросе
+Удалить (DROP VIEW)
+⚡ Мини-шпаргалка
+SQL
+-- создать
+CREATE VIEW name AS SELECT ...
+
+-- использовать
+SELECT * FROM name;
+
+-- удалить
+DROP VIEW name;
+
+-- изменить
+CREATE OR REPLACE VIEW name AS ...
