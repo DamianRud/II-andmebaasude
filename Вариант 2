@@ -1,0 +1,26 @@
+-- 1. Количество мероприятий по минутам (из времени)
+SELECT MINUTE(kellaaeg) AS minut, COUNT(*) AS yrituste_arv
+FROM avatud
+GROUP BY MINUTE(kellaaeg);
+
+-- 2. Мероприятия, где ответственный начинается с "Andres"
+-- или равен "Jaan Tamm", и дата не раньше 2026-05-07
+SELECT yritus
+FROM avatud
+WHERE (vastutaja LIKE 'Andres%' OR vastutaja = 'Jaan Tamm')
+  AND kuupaev >= '2026-05-07';
+
+-- 3. Уникальные ответственные, отсортированные по алфавиту
+SELECT DISTINCT vastutaja
+FROM avatud
+ORDER BY vastutaja;
+
+-- 4. Первая буква имени ответственного + количество записей
+SELECT LEFT(vastutaja, 1) AS esimeneTaht, COUNT(vastutaja) AS kogus
+FROM avatud
+GROUP BY LEFT(vastutaja, 1);
+
+-- 5. Показать все мероприятия, которые проходят в апреле
+SELECT yritus
+FROM avatud
+WHERE MONTH(kuupaev) = 4;
