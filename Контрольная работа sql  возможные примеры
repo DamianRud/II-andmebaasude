@@ -1,0 +1,43 @@
+/* 
+   ПРИМЕРЫ ВСЕХ ОСНОВНЫХ ОПЕРАЦИЙ ДЛЯ КОНТРОЛЬНОЙ
+*/
+
+-- 1. ВЫБОРКА С ФИЛЬТРАЦИЕЙ И СОРТИРОВКОЙ
+SELECT Name, Salary            -- Выбираем столбцы (что показать)
+FROM Employees                 -- Из какой таблицы
+WHERE Gender = 'M'             -- Условие (только мужчины)
+  AND DeptId IN (2, 11)        -- Которые работают в 2-м или 11-м отделе
+ORDER BY Salary DESC;          -- Сортировка от большего к меньшему
+
+-- 2. ГРУППИРОВКА И АГРЕГАТНЫЕ ФУНКЦИИ
+SELECT DeptId, 
+       COUNT(*) AS TotalStaff, -- Считаем количество людей в группе
+       AVG(Salary) AS AvgPay   -- Считаем среднюю зарплату в группе
+FROM Employees
+GROUP BY DeptId                -- Группируем данные по отделам
+HAVING COUNT(*) >= 2;          -- Фильтруем ГРУППЫ (показать отделы, где 2+ сотрудника)
+
+-- 3. РАБОТА С ДИАПАЗОНАМИ (NOT BETWEEN) И ШАБЛОНАМИ (LIKE)
+SELECT * 
+FROM Employees
+WHERE Salary NOT BETWEEN 3000 AND 10000 -- Зарплата ВНЕ этого диапазона
+  OR Name LIKE 'R%';                   -- ИЛИ имя начинается на 'R'
+
+-- 4. ВЛОЖЕННЫЕ ЗАПРОСЫ (SUBQUERIES)
+SELECT Name, EmailId
+FROM Employees
+WHERE Salary = (               -- Найти сотрудника, у которого зарплата равна...
+    SELECT MAX(Salary)         -- ...максимальной зарплате во всей таблице
+    FROM Employees
+);
+
+-- 5. ОБНОВЛЕНИЕ ДАННЫХ (UPDATE)
+UPDATE Employees
+SET Salary = Salary * 1.15,    -- Увеличить зарплату на 15%
+    DeptId = 6                 -- И одновременно перевести в 6-й отдел
+WHERE Id = 1014;               -- ОБЯЗАТЕЛЬНО условие, чтобы не изменить всех!
+
+-- 6. УДАЛЕНИЕ ДАННЫХ (DELETE)
+DELETE FROM Employees
+WHERE EmailId IS NULL          -- Удалить записи, где не указана почта
+   OR Id = 13;                 -- Или конкретного человека по ID
