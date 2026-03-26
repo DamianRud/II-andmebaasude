@@ -1,0 +1,26 @@
+-- 1. Считаем количество мероприятий для каждого ответственного
+SELECT vastutaja, COUNT(*) AS yrituste_arv
+FROM avatud
+GROUP BY vastutaja;
+
+-- 2. Получаем уникальные даты мероприятий и сортируем их
+SELECT DISTINCT kuupaev
+FROM avatud
+ORDER BY kuupaev;
+
+-- 3. Выбираем мероприятия, где ответственный Mari Maasikas или Jaan Tamm,
+-- и дата не раньше 2026-04-01
+SELECT yritus
+FROM avatud
+WHERE (vastutaja = 'Mari Maasikas' OR vastutaja = 'Jaan Tamm')
+  AND kuupaev >= '2026-04-01';
+
+-- 4. Считаем количество мероприятий по месяцам
+SELECT MONTH(kuupaev) AS kuu, COUNT(*) AS yrituste_arv
+FROM avatud
+GROUP BY MONTH(kuupaev);
+
+-- 5. Выбираем все мероприятия, в названии которых есть буква "s"
+SELECT yritus
+FROM avatud
+WHERE yritus LIKE '%s%';
