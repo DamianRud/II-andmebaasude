@@ -1,0 +1,244 @@
+Create DATABASE SQLpäringud;
+use SQLpäringud;
+
+
+CREATE TABLE firma(
+    firmaID INT IDENTITY(1,1) PRIMARY KEY,
+    firmanimi VARCHAR(50),
+    aadress VARCHAR(100),
+    telefon VARCHAR(20)
+);
+
+
+
+
+
+CREATE TABLE praktikajuhendaja(
+    praktikajuhendajaID INT IDENTITY(1,1) PRIMARY KEY,
+    eesnimi VARCHAR(30),
+    perekonnanimi VARCHAR(30),
+    synniaeg DATE,
+    telefon VARCHAR(20)
+);
+
+
+
+
+CREATE TABLE praktikabaas(
+    praktikabaasID INT IDENTITY(1,1) PRIMARY KEY,
+    firmaID INT,
+    praktikatingimused VARCHAR(50),
+    arvutiprogramm VARCHAR(50),
+    juhendajaID INT,
+    FOREIGN KEY (firmaID) REFERENCES firma(firmaID),
+    FOREIGN KEY (juhendajaID) REFERENCES praktikajuhendaja(praktikajuhendajaID)
+);
+
+
+
+INSERT INTO firma (firmanimi, aadress, telefon) VALUES
+('TechNova', 'Tallinn', '5551111'),
+('DataSoft', 'Tartu', '5552222'),
+('AlphaTech', 'Narva', '5553333'),
+('BetaSolutions', 'Parnu', '5554444'),
+('GammaGroup', 'Viljandi', '5555555');
+
+
+
+INSERT INTO praktikajuhendaja (eesnimi, perekonnanimi, synniaeg, telefon) VALUES
+('Jaan', 'Tamm', '1985-03-15', '5123456'),
+('Mari', 'Kask', '1990-09-20', '5234567'),
+('Peeter', 'Saar', '1988-10-10', '5345678'),
+('Kati', 'Mets', '1995-11-05', '5456789'),
+('Toomas', 'Kivi', '1982-07-25', '5567890');
+
+
+
+
+
+
+
+
+INSERT INTO praktikabaas (firmaID, praktikatingimused, arvutiprogramm, juhendajaID) VALUES
+(1, 'Hea', 'Excel', 1),
+(2, 'Vaga hea', 'Python', 2),
+(3, 'Rahuldav', 'Java', 3),
+(4, 'Hea', 'C#', 4),
+(5, 'Vaga hea', 'SQL', 5),
+(1, 'Hea', 'PowerBI', 2),
+(2, 'Rahuldav', 'HTML', 3);
+
+
+SELECT * FROM firma;
+SELECT * FROM praktikajuhendaja;
+SELECT * FROM praktikabaas;
+
+
+
+SELECT * FROM firma
+WHERE firmanimi LIKE '%a%';
+
+
+
+SELECT *
+FROM praktikabaas, firma
+WHERE firma.firmaID = praktikabaas.firmaID
+ORDER BY firmanimi;
+
+
+
+
+SELECT firmanimi, COUNT(praktikabaasID) AS kogus
+FROM praktikabaas, firma
+WHERE firma.firmaID = praktikabaas.firmaID
+GROUP BY firmanimi;
+
+
+
+
+SELECT *
+FROM praktikajuhendaja
+WHERE MONTH(synniaeg) IN (9, 10, 11);
+
+
+
+--Количество мест практики у каждого руководителя
+SELECT eesnimi, perekonnanimi, COUNT(praktikabaasID) AS kogus
+FROM praktikajuhendaja pj
+LEFT JOIN praktikabaas pb ON pj.praktikajuhendajaID = pb.juhendajaID
+GROUP BY eesnimi, perekonnanimi;
+
+
+ALTER TABLE praktikajuhendaja
+ADD palk INT;
+
+
+
+-- Процедура для добавления нового столбца
+CREATE PROCEDURE AddBoonusColumn
+AS
+BEGIN
+    ALTER TABLE praktikajuhendaja
+    ADD boonus INT;
+END;
+
+EXEC AddBoonusColumn;
+
+SELECT * FROM firma;
+SELECT * FROM praktikajuhendaja;
+SELECT * FROM praktikabaas;
+
+
+UPDATE praktikajuhendaja SET palk = 1200 WHERE praktikajuhendajaID = 1;
+UPDATE praktikajuhendaja SET palk = 1500 WHERE praktikajuhendajaID = 2;
+UPDATE praktikajuhendaja SET palk = 1300 WHERE praktikajuhendajaID = 3;
+UPDATE praktikajuhendaja SET palk = 1700 WHERE praktikajuhendajaID = 4;
+UPDATE praktikajuhendaja SET palk = 1600 WHERE praktikajuhendajaID = 5;
+
+
+SELECT * FROM praktikajuhendaja;
+
+
+SELECT AVG(palk) AS keskmine_palk
+FROM praktikajuhendaja;
+
+
+SELECT SUM(palk) AS kogu_palk
+FROM praktikajuhendaja;
+
+
+SELECT eesnimi, perekonnanimi, palk
+FROM praktikajuhendaja
+WHERE palk > 1400;
+
+
+
+
+SELECT * FROM firma;
+SELECT * FROM praktikajuhendaja;
+SELECT * FROM praktikabaas;
+
+
+-- Процедура для расчёта средней зарплаты
+CREATE PROCEDURE AvgPalk
+AS
+BEGIN
+    SELECT AVG(palk) AS keskmine_palk
+    FROM praktikajuhendaja;
+END;
+
+
+EXEC AvgPalk;
+
+
+
+-- Процедура для добавления новой записи в таблицу firma
+CREATE PROCEDURE AddFirma
+    @firmanimi VARCHAR(50),
+    @aadress VARCHAR(100),
+    @telefon VARCHAR(20)
+AS
+BEGIN
+    INSERT INTO firma (firmanimi, aadress, telefon)
+    VALUES (@firmanimi, @aadress, @telefon);
+END;
+
+EXEC AddFirma 'NewCompany', 'Tallinn', '5559999';
+SELECT * FROM firma;
+
+
+
+
+
+
+
+
+
+
+
+
+SELECT
+    eesnimi AS Eesnimi,
+    perekonnanimi AS Perekonnanimi,
+    synniaeg AS Sünnikuupäev,
+    dbo.fnComputeAge(synniaeg) AS Vanus_v1, 
+    dbo.CalculateAge(synniaeg) AS Vanus_v2
+FROM praktikajuhendaja;
+
+create function fnComputeAge(@DOB datetime)
+returns nvarchar(50)
+as begin
+    declare @tempdate datetime, @years int, @months int, @days int
+    select @tempdate = @DOB
+
+    select @years = datediff(year, @tempdate, getdate()) - case when (month(@DOB) > month(GETDATE())) or (MONTH(@DOB) = month(getdate()) and day(@DOB) > DAY(getdate())) then 1 else 0 end
+    select @tempdate = dateadd(year, @years, @tempdate)
+
+    select @months = datediff(month, @tempdate, getdate()) - case when day(@DOB) > day(getdate()) then 1 else 0 end
+    select @tempdate = dateadd(MONTH, @months, @tempdate)
+
+    select @days = datediff(day, @tempdate, getdate())
+
+    declare @Age nvarchar(50)
+    set @Age = cast(@years as nvarchar(4)) + ' Years ' + cast(@months as nvarchar(2)) + ' Months ' + cast(@days as nvarchar(2)) + ' Days old'
+    
+    return @Age
+end
+
+
+create function dbo.CalculateAge(@DOB date)
+returns int
+as begin
+    declare @Age int
+
+    set @Age = DATEDIFF(YEAR, @DOB, GETDATE()) -
+        case
+            when (MONTH(@DOB) > MONTH(getdate())) or
+                 (MONTH(@DOB) = MONTH(GETDATE()) and DAY(@DOB) > day(GETDATE()))
+            then 1
+            else 0
+        end
+    
+    return @Age
+end
+
