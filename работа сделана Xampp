@@ -1,0 +1,124 @@
+-- 1. Создание базы данных
+CREATE DATABASE IF NOT EXISTS SQLpäringud;
+USE SQLpäringud;
+
+-- 2. Таблицы
+CREATE TABLE firma(
+    firmaID INT AUTO_INCREMENT PRIMARY KEY,
+    firmanimi VARCHAR(50),
+    aadress VARCHAR(100),
+    telefon VARCHAR(20)
+);
+
+CREATE TABLE praktikajuhendaja(
+    praktikajuhendajaID INT AUTO_INCREMENT PRIMARY KEY,
+    eesnimi VARCHAR(30),
+    perekonnanimi VARCHAR(30),
+    synniaeg DATE,
+    telefon VARCHAR(20),
+    palk INT,
+    boonus INT
+);
+
+CREATE TABLE praktikabaas(
+    praktikabaasID INT AUTO_INCREMENT PRIMARY KEY,
+    firmaID INT,
+    praktikatingimused VARCHAR(50),
+    arvutiprogramm VARCHAR(50),
+    juhendajaID INT,
+    FOREIGN KEY (firmaID) REFERENCES firma(firmaID),
+    FOREIGN KEY (juhendajaID) REFERENCES praktikajuhendaja(praktikajuhendajaID)
+);
+
+-- 3. Данные
+INSERT INTO firma (firmanimi, aadress, telefon) VALUES
+('TechNova', 'Tallinn', '5551111'),
+('DataSoft', 'Tartu', '5552222'),
+('AlphaTech', 'Narva', '5553333'),
+('BetaSolutions', 'Parnu', '5554444'),
+('GammaGroup', 'Viljandi', '5555555');
+
+INSERT INTO praktikajuhendaja (eesnimi, perekonnanimi, synniaeg, telefon, palk) VALUES
+('Jaan', 'Tamm', '1985-03-15', '5123456', 1200),
+('Mari', 'Kask', '1990-09-20', '5234567', 1500),
+('Peeter', 'Saar', '1988-10-10', '5345678', 1300),
+('Kati', 'Mets', '1995-11-05', '5456789', 1700),
+('Toomas', 'Kivi', '1982-07-25', '5567890', 1600);
+
+INSERT INTO praktikabaas (firmaID, praktikatingimused, arvutiprogramm, juhendajaID) VALUES
+(1, 'Hea', 'Excel', 1),
+(2, 'Vaga hea', 'Python', 2),
+(3, 'Rahuldav', 'Java', 3),
+(4, 'Hea', 'C#', 4),
+(5, 'Vaga hea', 'SQL', 5),
+(1, 'Hea', 'PowerBI', 2),
+(2, 'Rahuldav', 'HTML', 3);
+
+-- 4. Функции (Важно: DELIMITER нужен для корректного парсинга в XAMPP/phpMyAdmin)
+
+DELIMITER //
+
+-- Функция расчета возраста (числом)
+CREATE FUNCTION CalculateAge(DOB DATE) 
+RETURNS INT
+DETERMINISTIC
+BEGIN
+    RETURN TIMESTAMPDIFF(YEAR, DOB, CURDATE());
+END //
+
+-- Функция детального возраста (текстом)
+CREATE FUNCTION fnComputeAge(DOB DATE) 
+RETURNS VARCHAR(100)
+DETERMINISTIC
+BEGIN
+    DECLARE years INT;
+    DECLARE months INT;
+    DECLARE days INT;
+    DECLARE temp_date DATE;
+
+    SET years = TIMESTAMPDIFF(YEAR, DOB, CURDATE());
+    SET temp_date = DATE_ADD(DOB, INTERVAL years YEAR);
+    
+    SET months = TIMESTAMPDIFF(MONTH, temp_date, CURDATE());
+    SET temp_date = DATE_ADD(temp_date, INTERVAL months MONTH);
+    
+    SET days = DATEDIFF(CURDATE(), temp_date);
+
+    RETURN CONCAT(years, ' Years ', months, ' Months ', days, ' Days old');
+END //
+
+-- 5. Процедуры
+
+CREATE PROCEDURE AvgPalk()
+BEGIN
+    SELECT AVG(palk) AS keskmine_palk FROM praktikajuhendaja;
+END //
+
+CREATE PROCEDURE AddFirma(
+    IN f_nimi VARCHAR(50), 
+    IN f_aadress VARCHAR(100), 
+    IN f_tel VARCHAR(20)
+)
+BEGIN
+    INSERT INTO firma (firmanimi, aadress, telefon) VALUES (f_nimi, f_aadress, f_tel);
+END //
+
+DELIMITER ;
+
+-- 6. Примеры запросов
+
+-- Использование функций в SELECT
+SELECT 
+    eesnimi AS Eesnimi, 
+    perekonnanimi AS Perekonnanimi, 
+    synniaeg AS Sünnikuupäev,
+    fnComputeAge(synniaeg) AS Vanus_v1,
+    CalculateAge(synniaeg) AS Vanus_v2
+FROM praktikajuhendaja;
+
+-- Вызов процедур
+CALL AvgPalk();
+CALL AddFirma('NewCompany', 'Tallinn', '5559999');
+
+-- Просмотр результата добавления компании
+SELECT * FROM firma;
